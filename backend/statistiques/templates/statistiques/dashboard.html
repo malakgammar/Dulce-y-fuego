@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistiques - DulceYFuego</title>
+</head>
+<body>
+    <h1>Statistiques des Ventes</h1>
+
+    <h2>Chiffres clés</h2>
+    <ul>
+        <li>Total commandes : {{ total_commandes }}</li>
+        <li>Chiffre d'affaires : {{ chiffre_affaires }} DH</li>
+        <li>Commande moyenne : {{ moyenne }} DH</li>
+    </ul>
+
+    <h2>Ventes par catégorie</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Catégorie</th>
+                <th>Nombre de ventes</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stat in stats %}
+            <tr>
+                <td>{{ stat.categorie }}</td>
+                <td>{{ stat.nb_ventes }}</td>
+                <td>{{ stat.total }} DH</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">Aucune statistique disponible.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

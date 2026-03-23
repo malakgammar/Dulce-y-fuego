@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Personnel - DulceYFuego</title>
+</head>
+<body>
+    <h1>Gestion du Personnel</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Poste</th>
+                <th>Téléphone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employe in personnel %}
+            <tr>
+                <td>{{ employe.nom }}</td>
+                <td>{{ employe.prenom }}</td>
+                <td>{{ employe.poste }}</td>
+                <td>{{ employe.telephone }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">Aucun employé enregistré.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
