@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil — Dulce y Fuego</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C8102E;
+            --rouge-fonce: #8B0A1E;
+            --noir: #0A0A0A;
+            --gris-fonce: #1A1A1A;
+            --gris-moyen: #2A2A2A;
+            --blanc: #F5F0EB;
+            --blanc-pur: #FFFFFF;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--noir);
+            color: var(--blanc);
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            background: var(--noir) !important;
+            border-bottom: 1px solid var(--rouge);
+            padding: 1.2rem 2rem;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem; font-weight: 900;
+            color: var(--blanc-pur) !important;
+        }
+        .navbar-brand span { color: var(--rouge); }
+        .nav-link {
+            color: rgba(245,240,235,0.7) !important;
+            font-size: 0.75rem; font-weight: 600;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        .nav-link:hover { color: var(--rouge) !important; }
+
+        /* HERO PROFIL */
+        .profile-hero {
+            background: var(--gris-fonce);
+            border-bottom: 1px solid #2A2A2A;
+            padding: 3rem 0 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -5%;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(200,16,46,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .avatar {
+            width: 80px; height: 80px;
+            background: var(--gris-moyen);
+            border: 2px solid var(--rouge);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem; font-weight: 700;
+            color: var(--rouge);
+            margin-bottom: 1rem;
+        }
+        .profile-tag {
+            font-size: 0.6rem; font-weight: 700;
+            letter-spacing: 0.3em; text-transform: uppercase;
+            color: var(--rouge); margin-bottom: 0.5rem;
+        }
+        .profile-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem; font-weight: 900;
+            color: var(--blanc-pur); margin-bottom: 0.25rem;
+        }
+        .profile-email {
+            font-size: 0.8rem; font-weight: 300;
+            color: rgba(245,240,235,0.4);
+        }
+        .profile-badge {
+            display: inline-block;
+            background: rgba(200,16,46,0.15);
+            border: 1px solid rgba(200,16,46,0.3);
+            color: var(--rouge);
+            font-size: 0.6rem; font-weight: 700;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            padding: 0.3rem 0.8rem;
+            margin-top: 0.75rem;
+        }
+
+        /* LAYOUT */
+        .profile-content { flex: 1; padding: 3rem 0 5rem; }
+
+        /* CARDS */
+        .profile-card {
+            background: var(--gris-fonce);
+            border: 1px solid #2A2A2A;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--rouge);
+        }
+        .card-section-tag {
+            font-size: 0.6rem; font-weight: 700;
+            letter-spacing: 0.25em; text-transform: uppercase;
+            color: var(--rouge); margin-bottom: 0.5rem;
+        }
+        .card-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem; font-weight: 700;
+            color: var(--blanc-pur); margin-bottom: 1.5rem;
+        }
+        .card-divider {
+            width: 30px; height: 2px;
+            background: var(--rouge); margin-bottom: 1.5rem;
+        }
+
+        /* FORM */
+        .form-label {
+            font-size: 0.65rem; font-weight: 700;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: rgba(245,240,235,0.5); margin-bottom: 0.5rem;
+        }
+        .form-control, .form-control:focus {
+            background: var(--gris-moyen);
+            border: 1px solid #333; border-radius: 0;
+            color: var(--blanc-pur);
+            padding: 0.85rem 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem; font-weight: 400;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: none;
+        }
+        .form-control:focus {
+            border-color: var(--rouge);
+            box-shadow: 0 0 0 2px rgba(200,16,46,0.15);
+        }
+        .form-control::placeholder { color: rgba(245,240,235,0.2); font-weight: 300; }
+        textarea.form-control { resize: none; min-height: 90px; }
+        .input-group-text {
+            background: #333; border: 1px solid #333;
+            border-radius: 0;
+            color: rgba(245,240,235,0.4); font-size: 0.85rem;
+        }
+        .btn-save {
+            background: var(--rouge); color: var(--blanc-pur);
+            border: none; border-radius: 0; padding: 0.85rem 2.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .btn-save:hover {
+            background: var(--rouge-fonce); color: var(--blanc-pur);
+            transform: translateY(-1px);
+        }
+
+        /* COMMANDES */
+        .commande-item {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            background: var(--gris-moyen);
+            border: 1px solid #333;
+            margin-bottom: 0.75rem;
+            transition: border-color 0.2s;
+        }
+        .commande-item:hover { border-color: var(--rouge); }
+        .commande-id {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; font-weight: 700;
+            color: var(--blanc-pur);
+        }
+        .commande-date {
+            font-size: 0.7rem; font-weight: 400;
+            color: rgba(245,240,235,0.35);
+            letter-spacing: 0.05em;
+        }
+        .commande-statut {
+            font-size: 0.6rem; font-weight: 700;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            padding: 0.3rem 0.8rem;
+        }
+        .statut-livree { background: rgba(76,175,80,0.15); color: #4CAF50; border: 1px solid rgba(76,175,80,0.3); }
+        .statut-en_cours { background: rgba(255,152,0,0.15); color: #FF9800; border: 1px solid rgba(255,152,0,0.3); }
+        .statut-en_attente { background: rgba(200,16,46,0.15); color: var(--rouge); border: 1px solid rgba(200,16,46,0.3); }
+
+        .btn-pdf {
+            background: transparent;
+            color: rgba(245,240,235,0.5);
+            border: 1px solid #333;
+            border-radius: 0; padding: 0.4rem 1rem;
+            font-size: 0.65rem; font-weight: 600;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-pdf:hover {
+            border-color: var(--rouge);
+            color: var(--rouge);
+        }
+
+        .empty-commandes {
+            text-align: center; padding: 3rem 1rem;
+            color: rgba(245,240,235,0.2);
+        }
+        .empty-commandes .icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.4; }
+        .empty-commandes p { font-size: 0.8rem; }
+
+        /* STATS RAPIDES */
+        .stat-mini {
+            background: var(--gris-moyen);
+            border: 1px solid #2A2A2A;
+            padding: 1.25rem;
+            text-align: center;
+        }
+        .stat-mini-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem; font-weight: 700;
+            color: var(--blanc-pur); display: block;
+        }
+        .stat-mini-label {
+            font-size: 0.6rem; font-weight: 600;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: rgba(245,240,235,0.3);
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--gris-fonce);
+            border-top: 1px solid #2A2A2A;
+            padding: 1.5rem 0; text-align: center;
+        }
+        .footer-copy { font-size: 0.7rem; color: rgba(245,240,235,0.2); letter-spacing: 0.1em; }
+        .footer-copy span { color: var(--rouge); }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'menu' %}">Dulce <span>y</span> Fuego</a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span style="color:var(--blanc)">&#9776;</span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'menu' %}">Menu</a></li>
+                <li class="nav-item"><a class="nav-link" href="/commandes/">Commandes</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Mon profil</a></li>
+                <li class="nav-item ms-2">
+                    <a class="nav-link" href="{% url 'logout' %}"
+                       style="color:var(--rouge)!important;border:1px solid var(--rouge);padding:.4rem 1rem;">
+                        Déconnexion
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO PROFIL -->
+<section class="profile-hero">
+    <div class="container">
+        <div class="avatar">{{ user.username|first|upper }}</div>
+        <p class="profile-tag">Espace personnel</p>
+        <h1 class="profile-name">{{ user.get_full_name|default:user.username }}</h1>
+        <p class="profile-email">{{ user.email }}</p>
+        <span class="profile-badge">Client actif</span>
+    </div>
+</section>
+
+<!-- CONTENU -->
+<div class="profile-content">
+    <div class="container">
+        <div class="row g-4">
+
+            <!-- COLONNE GAUCHE -->
+            <div class="col-lg-7">
+
+                <!-- STATS RAPIDES -->
+                <div class="row g-2 mb-4">
+                    <div class="col-4">
+                        <div class="stat-mini">
+                            <span class="stat-mini-number">{{ commandes|length|default:"0" }}</span>
+                            <span class="stat-mini-label">Commandes</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-mini">
+                            <span class="stat-mini-number">{{ commandes|length|default:"0" }}</span>
+                            <span class="stat-mini-label">Factures</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-mini">
+                            <span class="stat-mini-number" style="color:var(--rouge)">★</span>
+                            <span class="stat-mini-label">Fidèle</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODIFIER PROFIL -->
+                <div class="profile-card">
+                    <p class="card-section-tag">Paramètres</p>
+                    <h2 class="card-section-title">Mon profil</h2>
+                    <div class="card-divider"></div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text">✉</span>
+                                <input type="email" name="email" class="form-control"
+                                       value="{{ user.email }}" placeholder="votre@email.com">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Téléphone</label>
+                            <div class="input-group">
+                                <span class="input-group-text">📞</span>
+                                <input type="text" name="phone" class="form-control"
+                                       value="{{ user.phone }}" placeholder="+212 6XX XXX XXX">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Adresse de livraison</label>
+                            <textarea name="address" class="form-control"
+                                      placeholder="Votre adresse complète...">{{ user.address }}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn-save">Enregistrer →</button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- COLONNE DROITE : COMMANDES -->
+            <div class="col-lg-5">
+                <div class="profile-card">
+                    <p class="card-section-tag">Historique</p>
+                    <h2 class="card-section-title">Mes commandes</h2>
+                    <div class="card-divider"></div>
+
+                    {% for cmd in commandes %}
+                    <div class="commande-item">
+                        <div>
+                            <div class="commande-id">#{{ cmd.id }}</div>
+                            <div class="commande-date">{{ cmd.created_at|date:"d/m/Y à H:i" }}</div>
+                            <span class="commande-statut statut-{{ cmd.statut }}">
+                                {{ cmd.get_statut_display }}
+                            </span>
+                        </div>
+                        <div class="d-flex flex-column align-items-end gap-2">
+                            <span style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--blanc-pur);">
+                                {{ cmd.total }} DH
+                            </span>
+                            <a href="{% url 'generer_facture' cmd.id %}" class="btn-pdf">
+                                PDF ↓
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-commandes">
+                        <div class="icon">🍽</div>
+                        <p>Aucune commande pour le moment.</p>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <p class="footer-copy">© 2026 Dulce <span>y</span> Fuego — Système de gestion</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

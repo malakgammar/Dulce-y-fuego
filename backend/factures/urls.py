@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import FactureListView
+from .views import generer_facture
 
 urlpatterns = [
-    path('', FactureListView.as_view(), name='factures'),
+    path('facture/<int:order_id>/', generer_facture, name='generer_facture'),
 ]

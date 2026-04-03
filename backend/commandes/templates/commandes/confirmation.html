@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande confirmée — Dulce y Fuego</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --rouge:#C8102E; --rouge-fonce:#8B0A1E; --noir:#0A0A0A; --gris-fonce:#1A1A1A; --gris-moyen:#2A2A2A; --blanc:#F5F0EB; --blanc-pur:#FFFFFF; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--noir); color:var(--blanc); font-family:'Montserrat',sans-serif; min-height:100vh; display:flex; flex-direction:column; }
+        .navbar { background:var(--noir)!important; border-bottom:1px solid var(--rouge); padding:1.2rem 2rem; }
+        .navbar-brand { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:900; color:var(--blanc-pur)!important; }
+        .navbar-brand span { color:var(--rouge); }
+        .nav-link { color:rgba(245,240,235,0.7)!important; font-size:0.75rem; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; }
+        .nav-link:hover { color:var(--rouge)!important; }
+        .deco-line { width:100%; height:3px; background:linear-gradient(90deg,transparent,var(--rouge),transparent); opacity:0.4; }
+        .main-content { flex:1; display:flex; align-items:center; justify-content:center; padding:4rem 1rem; }
+
+        /* CHECK ANIMÉ */
+        .success-circle {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: rgba(200,16,46,0.1); border: 2px solid var(--rouge);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 2rem;
+            animation: pop 0.5s ease;
+        }
+        @keyframes pop { 0%{transform:scale(0);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+        .check-icon { font-size: 2.5rem; }
+
+        .confirm-wrapper { text-align: center; max-width: 680px; width: 100%; }
+        .confirm-tag { font-size:0.65rem; font-weight:700; letter-spacing:0.3em; text-transform:uppercase; color:var(--rouge); display:block; margin-bottom:0.75rem; }
+        .confirm-title { font-family:'Playfair Display',serif; font-size:2.5rem; font-weight:900; color:var(--blanc-pur); margin-bottom:0.5rem; }
+        .confirm-subtitle { font-size:0.85rem; font-weight:300; color:rgba(245,240,235,0.4); margin-bottom:2.5rem; }
+        .confirm-divider { width:40px; height:2px; background:var(--rouge); margin:0 auto 2.5rem; }
+
+        /* CARD DÉTAILS */
+        .order-card { background:var(--gris-fonce); border:1px solid #2A2A2A; padding:2rem; text-align:left; margin-bottom:1.5rem; position:relative; }
+        .order-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--rouge); }
+        .order-meta { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+        .meta-item { }
+        .meta-label { font-size:0.6rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:rgba(245,240,235,0.3); margin-bottom:0.3rem; }
+        .meta-value { font-size:0.9rem; color:var(--blanc-pur); font-weight:500; }
+        .meta-value.order-id { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--blanc-pur); }
+        .meta-value.price { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--blanc-pur); }
+
+        .order-items-title { font-size:0.6rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:rgba(245,240,235,0.3); margin-bottom:0.75rem; padding-bottom:0.5rem; border-bottom:1px solid #2A2A2A; }
+        .order-item-row { display:flex; justify-content:space-between; padding:0.6rem 0; border-bottom:1px solid #1E1E1E; font-size:0.82rem; }
+        .order-item-row:last-child { border-bottom:none; }
+        .order-item-name { color:rgba(245,240,235,0.7); }
+        .order-item-price { color:var(--blanc-pur); font-weight:500; }
+
+        .statut-badge { display:inline-block; background:rgba(200,16,46,0.15); border:1px solid rgba(200,16,46,0.3); color:var(--rouge); font-size:0.6rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; padding:0.3rem 0.8rem; }
+
+        .btn-menu { background:var(--rouge); color:var(--blanc-pur); border:none; border-radius:0; padding:0.9rem 2.5rem; font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; transition:background 0.3s,transform 0.2s; text-decoration:none; display:inline-block; margin:0.4rem; }
+        .btn-menu:hover { background:var(--rouge-fonce); color:var(--blanc-pur); transform:translateY(-1px); }
+        .btn-profile { background:transparent; color:rgba(245,240,235,0.5); border:1px solid #333; border-radius:0; padding:0.9rem 2.5rem; font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; transition:all 0.2s; text-decoration:none; display:inline-block; margin:0.4rem; }
+        .btn-profile:hover { border-color:var(--rouge); color:var(--rouge); }
+
+        footer { background:var(--gris-fonce); border-top:1px solid #2A2A2A; padding:1.5rem 0; text-align:center; }
+        .footer-copy { font-size:0.7rem; color:rgba(245,240,235,0.2); }
+        .footer-copy span { color:var(--rouge); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'menu' %}">Dulce <span>y</span> Fuego</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'menu' %}">Menu</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="deco-line"></div>
+
+<div class="main-content">
+    <div class="confirm-wrapper">
+
+        <div class="success-circle">
+            <span class="check-icon">✓</span>
+        </div>
+
+        <span class="confirm-tag">Commande enregistrée</span>
+        <h1 class="confirm-title">Merci, {{ order.user.get_full_name|default:order.user.username }} !</h1>
+        <p class="confirm-subtitle">Votre commande a bien été confirmée. Notre équipe la prépare avec soin.</p>
+        <div class="confirm-divider"></div>
+
+        <!-- DÉTAILS COMMANDE -->
+        <div class="order-card">
+            <div class="order-meta">
+                <div class="meta-item">
+                    <p class="meta-label">Numéro de commande</p>
+                    <p class="meta-value order-id">#{{ order.id }}</p>
+                </div>
+                <div class="meta-item">
+                    <p class="meta-label">Date</p>
+                    <p class="meta-value">{{ order.created_at|date:"d/m/Y à H:i" }}</p>
+                </div>
+                <div class="meta-item">
+                    <p class="meta-label">Statut</p>
+                    <span class="statut-badge">{{ order.get_statut_display }}</span>
+                </div>
+                <div class="meta-item">
+                    <p class="meta-label">Total</p>
+                    <p class="meta-value price">{{ order.total }} DH</p>
+                </div>
+            </div>
+
+            {% if order.adresse_livraison %}
+            <div style="padding:0.75rem 0;border-top:1px solid #2A2A2A;margin-bottom:1rem;">
+                <p class="meta-label">Adresse de livraison</p>
+                <p style="font-size:0.82rem;color:rgba(245,240,235,0.6);margin-top:0.3rem;">{{ order.adresse_livraison }}</p>
+            </div>
+            {% endif %}
+
+            <p class="order-items-title">Détail des articles</p>
+            {% for item in order.order_items.all %}
+            <div class="order-item-row">
+                <span class="order-item-name">{{ item.plat.nom }} × {{ item.quantite }}</span>
+                <span class="order-item-price">{{ item.prix }} DH</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="d-flex justify-content-center flex-wrap">
+            <a href="{% url 'menu' %}" class="btn-menu">← Retour au menu</a>
+            <a href="{% url 'profile' %}" class="btn-profile">Mes commandes</a>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    <p class="footer-copy">© 2026 Dulce <span>y</span> Fuego</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
