@@ -262,7 +262,7 @@
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="{% url 'menu' %}">Menu</a></li>
-                <li class="nav-item"><a class="nav-link" href="/commandes/">Commandes</a></li>
+                <li class="nav-item"><a class="nav-link" href="/commandes/">Panier</a></li>
                 <li class="nav-item"><a class="nav-link active" href="#">Mon profil</a></li>
                 <li class="nav-item ms-2">
                     <a class="nav-link" href="{% url 'logout' %}"
@@ -275,26 +275,21 @@
     </div>
 </nav>
 
-<!-- HERO PROFIL -->
 <section class="profile-hero">
     <div class="container">
         <div class="avatar">{{ user.username|first|upper }}</div>
         <p class="profile-tag">Espace personnel</p>
         <h1 class="profile-name">{{ user.get_full_name|default:user.username }}</h1>
         <p class="profile-email">{{ user.email }}</p>
-        <span class="profile-badge">Client actif</span>
     </div>
 </section>
 
-<!-- CONTENU -->
 <div class="profile-content">
     <div class="container">
         <div class="row g-4">
 
-            <!-- COLONNE GAUCHE -->
             <div class="col-lg-7">
 
-                <!-- STATS RAPIDES -->
                 <div class="row g-2 mb-4">
                     <div class="col-4">
                         <div class="stat-mini">
@@ -316,7 +311,6 @@
                     </div>
                 </div>
 
-                <!-- MODIFIER PROFIL -->
                 <div class="profile-card">
                     <p class="card-section-tag">Paramètres</p>
                     <h2 class="card-section-title">Mon profil</h2>
@@ -355,7 +349,6 @@
 
             </div>
 
-            <!-- COLONNE DROITE : COMMANDES -->
             <div class="col-lg-5">
                 <div class="profile-card">
                     <p class="card-section-tag">Historique</p>
@@ -394,7 +387,6 @@
     </div>
 </div>
 
-<!-- FOOTER -->
 <footer>
     <p class="footer-copy">© 2026 Dulce <span>y</span> Fuego — Système de gestion</p>
 </footer>

@@ -86,7 +86,6 @@
     <div class="container">
         <div class="row g-4">
 
-            <!-- FORMULAIRE LIVRAISON -->
             <div class="col-lg-7">
                 <div class="confirm-card">
                     <p class="card-tag">Livraison</p>
@@ -119,6 +118,17 @@
                                           required>{{ user.address }}</textarea>
                             </div>
                         </div>
+                        <div class="mb-4">
+                            <label class="form-label">Instructions spéciales</label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">💬</span>
+
+                                <textarea name="commentaire"
+                                        class="form-control"
+                                        placeholder="Ex: sans oignons, allergie, peu épicé..."></textarea>
+                            </div>
+                        </div>
 
                         <button type="submit" class="btn-valider">
                             ✓ Valider ma commande
@@ -129,7 +139,6 @@
                 </div>
             </div>
 
-            <!-- RÉCAP COMMANDE -->
             <div class="col-lg-5">
                 <div class="confirm-card">
                     <p class="card-tag">Récapitulatif</p>
@@ -141,6 +150,8 @@
                         <div>
                             <p class="recap-item-name">{{ item.plat.nom }}</p>
                             <p class="recap-item-qty">{{ item.quantite }} × {{ item.plat.prix }} DH</p>
+                            
+                        </div>
                         </div>
                         <div class="recap-item-price">{{ item.sous_total }}<span> DH</span></div>
                     </div>

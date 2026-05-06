@@ -1,0 +1,29 @@
+<h2>Gestion des plats</h2>
+
+<a href="{% url 'add_plat' %}">➕ Ajouter plat</a>
+<a href="{% url 'add_categorie' %}">📂 Ajouter catégorie</a>
+
+<table>
+<tr>
+<th>Nom</th>
+<th>Prix</th>
+<th>Stock</th>
+<th>Catégorie</th>
+<th>Action</th>
+</tr>
+
+{% for p in plats %}
+<tr>
+<td>{{ p.nom }}</td>
+<td>{{ p.prix }}</td>
+<td>{{ p.stock }}</td>
+<td>{{ p.categorie }}</td>
+
+<td>
+<a href="{% url 'edit_plat' p.id %}">✏️</a>
+<a href="{% url 'delete_plat' p.id %}">❌</a>
+</td>
+
+</tr>
+{% endfor %}
+</table>

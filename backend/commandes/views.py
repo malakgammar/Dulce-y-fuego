@@ -3,6 +3,7 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Cart, CartItem, Order, OrderItem
 from menu.models import Plat
+from django.contrib.auth.decorators import login_required
 
 def get_or_create_cart(request):
     if request.user.is_authenticated:
@@ -13,16 +14,29 @@ def get_or_create_cart(request):
         cart, _ = Cart.objects.get_or_create(session_key=request.session.session_key)
     return cart
 
-
 class AjouterAuPanierView(LoginRequiredMixin, View):
     login_url = '/login/'
 
     def post(self, request, plat_id):
         plat = get_object_or_404(Plat, id=plat_id)
+
+        if plat.stock <= 0:
+            return redirect('menu')  # ou page produits
+
         cart = get_or_create_cart(request)
+
         quantite = int(request.POST.get('quantite', 1))
         if quantite < 1:
             quantite = 1
+
+        item_existant = CartItem.objects.filter(cart=cart, plat=plat).first()
+        quantite_existante = item_existant.quantite if item_existant else 0
+
+        if quantite + quantite_existante > plat.stock:
+            quantite = plat.stock - quantite_existante
+
+        if quantite <= 0:
+            return redirect('panier')
 
         cart_item, created = CartItem.objects.get_or_create(cart=cart, plat=plat)
 
@@ -32,8 +46,8 @@ class AjouterAuPanierView(LoginRequiredMixin, View):
             cart_item.quantite = quantite
 
         cart_item.save()
-        return redirect('panier')
 
+        return redirect('panier')
 
 class PanierView(LoginRequiredMixin, View):
     login_url = '/login/'
@@ -75,7 +89,10 @@ class ConfirmerCommandeView(LoginRequiredMixin, View):
         cart = get_or_create_cart(request)
         if not cart.items.exists():
             return redirect('panier')
-        return render(request, 'commandes/confirmer.html', {'cart': cart})
+
+        return render(request, 'commandes/confirmer.html', {
+            'cart': cart
+        })
 
     def post(self, request):
         cart = get_or_create_cart(request)
@@ -83,10 +100,12 @@ class ConfirmerCommandeView(LoginRequiredMixin, View):
             return redirect('panier')
 
         adresse = request.POST.get('adresse_livraison', '')
+        commentaire = request.POST.get('commentaire', '')
 
         order = Order.objects.create(
             user=request.user,
             adresse_livraison=adresse,
+            commentaire=commentaire,
             total=cart.total
         )
 
@@ -98,14 +117,33 @@ class ConfirmerCommandeView(LoginRequiredMixin, View):
                 prix=item.plat.prix
             )
 
+        item.plat.stock -= item.quantite
+        item.plat.save()
+
         cart.items.all().delete()
 
         return redirect('confirmation', order_id=order.id)
-
-
+    
 class ConfirmationView(LoginRequiredMixin, View):
     login_url = '/login/'
 
     def get(self, request, order_id):
         order = get_object_or_404(Order, id=order_id)
         return render(request, 'commandes/confirmation.html', {'order': order})
+
+
+@login_required
+def update_commande(request, id):
+    commande = get_object_or_404(Order, id=id)
+
+    if request.method == 'POST':
+        commande.status = request.POST.get('status')
+        commande.save()
+
+    return redirect('manager_dashboard')
+
+@login_required
+def delete_commande(request, id):
+    commande = get_object_or_404(Order, id=id)
+    commande.delete()
+    return redirect('manager_dashboard')

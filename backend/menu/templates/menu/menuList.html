@@ -516,8 +516,6 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
-<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand" href="/">Dulce <span>y</span> Fuego</a>
@@ -531,35 +529,31 @@
 
                 {% if request.user.is_authenticated %}
                     {% if request.user.is_superuser %}
-                        <!-- Admin -->
                         <li class="nav-item"><a class="nav-link" href="/dashboard/">Dashboard</a></li>
                         <li class="nav-item"><a class="nav-link" href="/statistiques/">Statistiques</a></li>
                         <li class="nav-item"><a class="nav-link" href="/personnel/">Personnel</a></li>
 
                     {% elif request.user.employe %}
                         {% if request.user.employe.poste == "serveur" %}
-                            <li class="nav-item"><a class="nav-link" href="/commandes/">Commandes</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/serveur/">Commandes</a></li>
                         {% elif request.user.employe.poste == "cuisinier" %}
                             <li class="nav-item"><a class="nav-link" href="/cuisine/">Cuisine</a></li>
                         {% elif request.user.employe.poste == "caissier" %}
                             <li class="nav-item"><a class="nav-link" href="/paiements/">Paiements</a></li>
                         {% elif request.user.employe.poste == "manager" %}
-                            <li class="nav-item"><a class="nav-link" href="/statistiques/">Statistiques</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/manager/">Statistiques</a></li>
                         {% endif %}
 
                     {% else %}
-                        <!-- Client -->
                         <li class="nav-item"><a class="nav-link" href="/commandes/">Panier</a></li>
                         <li class="nav-item"><a class="nav-link" href="/profile/">Mon profil</a></li>
                     {% endif %}
 
-                    <!-- Bouton logout -->
                     <li class="nav-item ms-2">
                         <a class="nav-link btn-rouge px-3" href="/logout/">Déconnexion</a>
                     </li>
 
                 {% else %}
-                    <!-- Non connecté -->
                     <li class="nav-item"><a class="nav-link" href="/login/">Connexion</a></li>
                     <li class="nav-item"><a class="nav-link" href="/register/">Inscription</a></li>
                     <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>
@@ -569,7 +563,6 @@
     </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
     <div class="container">
         <div class="row align-items-center g-5">
@@ -605,7 +598,6 @@
 
 <div class="deco-line"></div>
 
-<!-- FILTRES -->
 <section class="filter-section">
     <div class="container">
         <div class="d-flex align-items-center flex-wrap">
@@ -623,7 +615,6 @@
     </div>
 </section>
 
-<!-- MENU -->
 <section id="menu" style="background: var(--noir); padding-bottom: 5rem;">
     <div class="container">
         <div class="section-header">
@@ -635,7 +626,7 @@
 <div class="row g-4">
     {% for plat in plats %}
     <div class="col-sm-6 col-lg-4 plat-col" data-categorie="{{ plat.categorie.slug|default:'sans-categorie' }}">        <div class="plat-card position-relative">
-            {% if plat.image %}
+           {% if plat.image %}
             <img src="{{ plat.image.url }}" alt="{{ plat.nom }}" class="plat-card-img">
             {% else %}
             <div class="plat-card-img-placeholder">🍽</div>
@@ -658,7 +649,6 @@
                     {% endif %}
                 </div>
 
-                <!-- BOUTON PANIER -->
                 {% if plat.stock > 0 %}
                 <form method="POST" action="{% url 'ajouter_panier' plat.id %}" class="mt-3">
                     {% csrf_token %}
@@ -683,7 +673,6 @@
     </div>
 
     {% empty %}
-    <!-- Cartes de démonstration (inchangées) -->
     {% for i in "123456" %}
     <div class="col-sm-6 col-lg-4">
         <div class="plat-card position-relative">

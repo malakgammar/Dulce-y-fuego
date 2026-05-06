@@ -11,7 +11,7 @@ class CategorieAdmin(admin.ModelAdmin):
 
 @admin.register(Plat)
 class PlatAdmin(admin.ModelAdmin):
-    list_display = ('nom', 'categorie', 'prix')
+    list_display = ('nom', 'categorie', 'prix', 'stock')
     list_filter = ('categorie',)
-    search_fields = ('nom',)
+    search_fields = ('nom','description')
 

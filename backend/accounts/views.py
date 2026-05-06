@@ -1,4 +1,6 @@
 # accounts/views.py
+from urllib import request
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
@@ -18,34 +20,41 @@ def get_user_role(user):
     except:
         return 'client'  
 
-
 def login_view(request):
-    """Connexion des utilisateurs"""
+    error = None
+
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        selected_role = request.POST.get('role')  # rôle choisi UI
+
         user = authenticate(request, username=username, password=password)
+
         if user:
+            real_role = get_user_role(user)
+
+            # ❌ rôle incorrect
+            if selected_role and selected_role != real_role:
+                error = " Rôle incorrect. Veuillez sélectionner votre vrai profil."
+                return render(request, 'accounts/login.html', {'error': error})
+
+            # ✅ login OK
             login(request, user)
-            role = get_user_role(user)
 
-            if role == 'admin':
-                return redirect('/dashboard/')
-            elif role == 'serveur':
-                return redirect('/commandes/')
-            elif role == 'cuisinier':
-                return redirect('/cuisine/')
-            elif role == 'caissier':
-                return redirect('/paiements/')
-            elif role == 'manager':
-                return redirect('/statistiques/')
-            else:
-                return redirect('/')
+            redirects = {
+                'client': '/',
+                'serveur': '/serveur/',
+                'cuisinier': '/cuisine/',
+                'manager': '/manager/',
+                'admin': '/admin/',
+            }
+
+            return redirect(redirects.get(real_role, '/'))
+
         else:
-            return render(request, 'accounts/login.html', {'error': 'Identifiants invalides'})
+            error = " Identifiant ou mot de passe incorrect."
 
-    return render(request, 'accounts/login.html')
-
+    return render(request, 'accounts/login.html', {'error': error})
 
 def logout_view(request):
     logout(request)
@@ -61,11 +70,9 @@ def register_view(request):
         phone = request.POST.get('phone', '')
         address = request.POST.get('address', '')
 
-        # Vérifier si l'email existe déjà
         if User.objects.filter(email=email).exists():
             return render(request, 'accounts/register.html', {'error': 'Utilisateur déjà existe'})
 
-        # Création utilisateur
         user = User.objects.create_user(
             username=username,
             email=email,
@@ -74,7 +81,6 @@ def register_view(request):
             address=address
         )
 
-        # Connexion auto
         login(request, user)
         return redirect('/')
 

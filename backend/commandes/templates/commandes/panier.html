@@ -132,7 +132,6 @@
         {% if cart.items.exists %}
         <div class="row g-4">
 
-            <!-- LISTE ITEMS -->
             <div class="col-lg-8">
                 {% for item in cart.items.all %}
                 <div class="cart-item">
@@ -165,7 +164,6 @@
                         {{ item.sous_total }}<span>DH</span>
                     </div>
 
-                    <!-- SUPPRIMER -->
                     <form method="POST" action="{% url 'supprimer_item' item.id %}">
                         {% csrf_token %}
                         <button type="submit" class="btn-delete" title="Supprimer">✕</button>
@@ -175,7 +173,6 @@
                 {% endfor %}
             </div>
 
-            <!-- RÉSUMÉ -->
             <div class="col-lg-4">
                 <div class="summary-card position-relative">
                     <span class="summary-tag">Récapitulatif</span>

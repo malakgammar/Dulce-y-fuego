@@ -38,6 +38,8 @@ class Order(models.Model):
     statut = models.CharField(max_length=20, choices=STATUTS, default='en_attente')
     created_at = models.DateTimeField(auto_now_add=True)
     adresse_livraison = models.TextField(blank=True)
+    commentaire = models.TextField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Commande {self.id}"

@@ -14,6 +14,7 @@
                 <th>Date</th>
                 <th>Statut</th>
                 <th>Total</th>
+                <th>Commentaire</th>
             </tr>
         </thead>
         <tbody>
@@ -24,6 +25,15 @@
                 <td>{{ commande.date }}</td>
                 <td>{{ commande.statut }}</td>
                 <td>{{ commande.total }} DH</td>
+                <td>
+                    {% if commande.commentaire %}
+                        <span style="color:#ff9800;">
+                            💬 {{ commande.commentaire }}
+                        </span>
+                    {% else %}
+                        <span style="color:#777;">Aucun</span>
+                    {% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr><td colspan="5">Aucune commande pour le moment.</td></tr>
