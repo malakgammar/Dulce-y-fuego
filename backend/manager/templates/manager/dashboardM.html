@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Manager — Dulce y Fuego</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --rouge: #C8102E;
+            --blanc: #ffffff;
+            --noir: #0f0f0f;
+            --card: #1a1a1a;
+            --border: #2a2a2a;
+            --muted: #666;
+            --dim: #444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--noir); font-family: 'Segoe UI', sans-serif; color: #fff; overflow-x: hidden; }
+
+        /* ══════════════════════════
+           LEFT SIDEBAR NAVIGATION
+        ══════════════════════════ */
+        .side-nav {
+            position: fixed; top: 0; left: 0;
+            width: 210px; height: 100vh;
+            background: #000;
+            border-right: 1px solid #1a1a1a;
+            display: flex; flex-direction: column;
+            z-index: 200;
+        }
+
+        .side-brand {
+            font-family: 'Playfair Display', serif;
+            padding: 20px 18px;
+            border-bottom: 1px solid #1a1a1a;
+            font-size: 1.3rem; 
+            font-weight: 700; 
+            color: #fff;
+            text-decoration: none; 
+            display: block;
+            letter-spacing: 0.01em;
+        }
+        .side-brand span { color: var(--rouge); }
+
+        .nav-label {
+            padding: 16px 18px 5px;
+            font-size: 10px; color: #2a2a2a;
+            text-transform: uppercase; letter-spacing: 0.12em;
+        }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 9px;
+            padding: 10px 18px; font-size: 13px; color: #555;
+            text-decoration: none; border-left: 3px solid transparent;
+            cursor: pointer; transition: all 0.18s; user-select: none;
+        }
+        .nav-item:hover { color: #bbb; background: #080808; }
+        .nav-item.active { color: #fff; border-left-color: var(--rouge); background: #0d0000; }
+        .nav-item .ni { width: 16px; text-align: center; font-size: 13px; }
+
+        .side-footer {
+            margin-top: auto; padding: 16px 18px;
+            border-top: 1px solid #1a1a1a;
+        }
+        .side-user-name { font-size: 12px; color: #555; text-align: center; margin-bottom: 4px; }
+        .side-user-role { font-size: 10px; color: #333; text-align: center; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.1em; }
+        .btn-logout-side {
+            display: block; text-align: center; text-decoration: none;
+            color: var(--rouge); border: 1px solid var(--rouge);
+            border-radius: 7px; padding: 8px; font-size: 12px;
+            transition: all 0.2s;
+        }
+        .btn-logout-side:hover { background: var(--rouge); color: #fff; }
+
+        /* ══════════════════════════
+           MAIN AREA
+        ══════════════════════════ */
+        .main {
+            margin-left: 210px;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            background: #000; border-bottom: 1px solid #1a1a1a;
+            padding: 13px 26px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-title { font-size: 15px; font-weight: 500; color: #fff; }
+        .live-dot { display:inline-block; width:7px; height:7px; background:#22c55e; border-radius:50%; margin-right:5px; animation:pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .topbar-live { font-size: 11px; color: #555; }
+
+        /* PAGES */
+        .page { display: none; padding: 24px 26px; }
+        .page.active { display: block; }
+
+        /* ══════════════════════════
+           STAT CARDS
+        ══════════════════════════ */
+        .stat-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 18px 20px;
+            transition: border-color 0.2s;
+        }
+        .stat-card:hover { border-color: var(--rouge); }
+        .stat-icon { font-size: 20px; margin-bottom: 10px; opacity: 0.7; }
+        .stat-label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .stat-value { color: #fff; font-size: 26px; font-weight: 700; }
+        .stat-sub   { color: #444; font-size: 11px; margin-top: 4px; }
+
+        /* ══════════════════════════
+           CHART CARDS
+        ══════════════════════════ */
+        .chart-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px;
+        }
+        .chart-title { color: #fff; font-size: 13px; font-weight: 500; margin-bottom: 16px; }
+
+        /* PERIOD SELECT */
+        .period-select {
+            background: #111; border: 1px solid var(--border);
+            border-radius: 7px; color: #ccc; font-size: 12px;
+            padding: 6px 12px; outline: none; cursor: pointer;
+        }
+        .period-select:focus { border-color: var(--rouge); }
+
+        /* ══════════════════════════
+           TABLE CARD
+        ══════════════════════════ */
+        .tbl-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden;
+        }
+        .tbl-card-header {
+            padding: 14px 18px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .tbl-card-title { color: #fff; font-size: 14px; font-weight: 500; }
+
+        .m-table { width: 100%; border-collapse: collapse; }
+        .m-table th {
+            color: var(--muted); font-size: 10px; text-transform: uppercase;
+            letter-spacing: 0.08em; padding: 10px 14px;
+            border-bottom: 1px solid var(--border); text-align: left; font-weight: 500;
+        }
+        .m-table td {
+            padding: 11px 14px; font-size: 13px; color: #bbb;
+            border-bottom: 1px solid #161616; vertical-align: middle;
+        }
+        .m-table tr:last-child td { border: none; }
+        .m-table tbody tr:hover td { background: #1d1d1d; }
+
+        /* ══════════════════════════
+           BADGES
+        ══════════════════════════ */
+        .badge-s { font-size: 10px; padding: 3px 9px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+        .bs-en_attente     { background:#2d2200; color:#f59e0b; }
+        .bs-en_cours       { background:#001833; color:#60a5fa; }
+        .bs-en_preparation { background:#001833; color:#60a5fa; }
+        .bs-livree         { background:#1e1b4b; color:#a5b4fc; }
+        .bs-annulee        { background:#220000; color:#f87171; }
+        .bs-prete          { background:#002208; color:#4ade80; }
+        .bp-cuisinier      { background:#2d1000; color:#fb923c; }
+        .bp-serveur        { background:#002208; color:#4ade80; }
+        .bp-caissier       { background:#001833; color:#60a5fa; }
+        .bp-manager        { background:#2d0022; color:#f0abfc; }
+
+        /* ══════════════════════════
+           BUTTONS
+        ══════════════════════════ */
+        .btn-primary-m {
+            background: var(--rouge); color: #fff; border: none;
+            border-radius: 7px; font-size: 12px; font-weight: 500;
+            padding: 7px 14px; cursor: pointer; text-decoration: none;
+            display: inline-block; transition: opacity 0.15s;
+        }
+        .btn-primary-m:hover { opacity: 0.85; color: #fff; }
+
+        .btn-edit-m   { background: #1d4ed8; color: #fff; border: none; border-radius: 6px; font-size: 11px; padding: 5px 11px; cursor: pointer; text-decoration: none; display: inline-block; transition: opacity 0.15s; }
+        .btn-delete-m { background: #991b1b; color: #fff; border: none; border-radius: 6px; font-size: 11px; padding: 5px 11px; cursor: pointer; text-decoration: none; display: inline-block; transition: opacity 0.15s; }
+        .btn-edit-m:hover, .btn-delete-m:hover { opacity: 0.8; color: #fff; }
+
+        /* ══════════════════════════
+           INLINE EDIT PANEL
+        ══════════════════════════ */
+        .inline-form {
+            display: none; background: #111;
+            border-top: 1px solid var(--border);
+            padding: 16px 18px;
+        }
+        .inline-form.open { display: block; }
+
+        /* ══════════════════════════
+           FORM INPUTS
+        ══════════════════════════ */
+        .f-label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; display: block; }
+        .f-input {
+            width: 100%; background: #1a1a1a; border: 1px solid var(--border);
+            border-radius: 7px; color: #fff; font-size: 12px;
+            padding: 8px 11px; outline: none; transition: border-color 0.2s;
+            margin-bottom: 10px;
+        }
+        .f-input:focus { border-color: var(--rouge); }
+        select.f-input option { background: #1a1a1a; }
+        .btn-submit-m {
+            background: var(--rouge); color: #fff; border: none; border-radius: 7px;
+            font-size: 12px; font-weight: 500; padding: 8px 18px; cursor: pointer;
+            transition: opacity 0.15s;
+        }
+        .btn-submit-m:hover { opacity: 0.85; }
+
+        /* ══════════════════════════
+           ADD FORM CARD
+        ══════════════════════════ */
+        .add-card {
+            background: #0d0d0d; border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; margin-bottom: 20px;
+        }
+        .add-card-title { color: #fff; font-size: 13px; font-weight: 500; margin-bottom: 14px; }
+
+        /* ══════════════════════════
+           SEARCH + FILTER
+        ══════════════════════════ */
+        .search-in {
+            background: #111; border: 1px solid var(--border);
+            border-radius: 7px; color: #ccc; font-size: 12px;
+            padding: 7px 13px; outline: none; width: 200px;
+            transition: border-color 0.2s;
+        }
+        .search-in:focus { border-color: var(--rouge); }
+
+        .filter-select {
+            background: #111; border: 1px solid var(--border);
+            border-radius: 7px; color: #ccc; font-size: 12px;
+            padding: 7px 13px; outline: none; cursor: pointer;
+        }
+        .filter-select:focus { border-color: var(--rouge); }
+
+        /* ══════════════════════════
+           PLAT IMAGE
+        ══════════════════════════ */
+        .plat-img { width: 34px; height: 34px; border-radius: 6px; object-fit: cover; }
+        .plat-no-img { width: 34px; height: 34px; border-radius: 6px; background: #222; display:flex; align-items:center; justify-content:center; font-size:14px; }
+
+        /* ══════════════════════════
+           TOP PLATS BAR
+        ══════════════════════════ */
+        .tp-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #161616; }
+        .tp-row:last-child { border:none; }
+        .tp-rank { color:var(--rouge); font-weight:700; font-size:12px; width:18px; }
+        .tp-name { color:#bbb; font-size:12px; flex:1; }
+        .tp-bar-bg { width:80px; height:3px; background:#222; border-radius:2px; }
+        .tp-bar    { height:3px; background:var(--rouge); border-radius:2px; }
+        .tp-count  { color:#444; font-size:11px; width:55px; text-align:right; }
+
+        /* ══════════════════════════
+           COMMANDE DETAILS ROW
+        ══════════════════════════ */
+        .detail-row {
+            background: #111; border-top: 1px solid var(--border);
+            padding: 14px 18px;
+        }
+        .detail-items-list { list-style:none; padding:0; margin:8px 0 0; }
+        .detail-items-list li { color:#888; font-size:12px; padding:4px 0; border-bottom:1px solid #1a1a1a; display:flex; justify-content:space-between; }
+        .detail-items-list li:last-child { border:none; }
+
+        /* EMPTY */
+        .empty-td { text-align:center; color:#333; padding:32px !important; }
+
+        /* PAGE TITLE */
+        .page-title { font-size:17px; font-weight:500; margin-bottom:20px; }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
+<nav class="side-nav">
+    <a class="side-brand" href="#">Dulce <span>y</span> Fuego</a>
+
+    <span class="nav-label">Dashboard</span>
+    <div class="nav-item active" onclick="goTo('stats', this)">
+        <span class="ni">📊</span> Statistiques
+    </div>
+
+    <span class="nav-label">Gestion</span>
+    <div class="nav-item" onclick="goTo('employes', this)">
+        <span class="ni">👥</span> Employés
+    </div>
+        <div class="nav-item" onclick="goTo('categories', this)">
+        <span class="ni">🏷️</span> Catégories
+    </div>
+    <div class="nav-item" onclick="goTo('plats', this)">
+        <span class="ni">🍽</span> Plats
+    </div>
+    <div class="nav-item" onclick="goTo('commandes', this)">
+        <span class="ni">📋</span> Commandes
+    </div>
+
+
+    <span class="nav-label">Exports</span>
+    <div class="nav-item" onclick="goTo('rapports', this)">
+        <span class="ni">📁</span> Rapports
+    </div>
+
+    <div class="side-footer">
+        <div class="side-user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="side-user-role">Manager</div>
+        <a href="{% url 'logout' %}" class="btn-logout-side">Déconnexion</a>
+    </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     MAIN
+══════════════════════════════════════ -->
+<div class="main">
+
+    <div class="topbar">
+        <span class="topbar-title" id="topTitle">📊 Statistiques</span>
+        <span class="topbar-live"><span class="live-dot"></span>En direct</span>
+    </div>
+
+
+    <!-- ══════════════════
+         PAGE : STATS
+    ══════════════════ -->
+    <div class="page active" id="page-stats">
+
+        <!-- KPI -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-label">Chiffre d'affaires</div>
+                    <div class="stat-value">{{ total_revenue }} DH</div>
+                    <div class="stat-sub">Total cumulé</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-label">Total commandes</div>
+                    <div class="stat-value">{{ commandes }}</div>
+                    <div class="stat-sub">Toutes périodes</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-label">Employés</div>
+                    <div class="stat-value">{{ employes|length }}</div>
+                    <div class="stat-sub">Actifs</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">🍽</div>
+                    <div class="stat-label">Plats au menu</div>
+                    <div class="stat-value">{{ plats|length }}</div>
+                    <div class="stat-sub">Disponibles</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PERIOD SELECTOR -->
+        <div class="mb-3">
+            <form method="GET" id="periodForm">
+                <select name="period" class="period-select" onchange="document.getElementById('periodForm').submit()">
+                    <option value="day"   {% if period == 'day'   %}selected{% endif %}>Par jour</option>
+                    <option value="week"  {% if period == 'week'  %}selected{% endif %}>Par semaine</option>
+                    <option value="month" {% if period == 'month' %}selected{% endif %}>Par mois</option>
+                    <option value="year"  {% if period == 'year'  %}selected{% endif %}>Par année</option>
+                </select>
+            </form>
+        </div>
+
+        <!-- CHARTS ROW 1 -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-8">
+                <div class="chart-card">
+                    <div class="chart-title">💰 Ventes (DH)</div>
+                    <canvas id="chartVentes" height="100"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="chart-card">
+                    <div class="chart-title">📊 Statuts commandes</div>
+                    <canvas id="chartStatuts" height="190"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHARTS ROW 2 -->
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-title">🍽 Plats les plus vendus</div>
+                    <canvas id="chartPlats" height="130"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-card h-100">
+                    <div class="chart-title">🏆 Top plats</div>
+                    {% for p in top_plats %}
+                    <div class="tp-row">
+                        <div class="tp-rank">#{{ forloop.counter }}</div>
+                        <div class="tp-name">{{ p.plat__nom }}</div>
+                        <div class="tp-bar-bg"><div class="tp-bar" style="width:{{ p.pct }}%"></div></div>
+                        <div class="tp-count">{{ p.total }}</div>
+                    </div>
+                    {% empty %}
+                    <div style="color:#333; font-size:12px; text-align:center; padding:20px;">Aucune donnée</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /stats -->
+
+
+    <!-- ══════════════════
+         PAGE : COMMANDES
+    ══════════════════ -->
+    <div class="page" id="page-commandes">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="page-title mb-0">📋 Commandes</h2>
+            <div class="d-flex gap-2 align-items-center">
+                <!-- filtre statut -->
+                <form method="GET" id="filterForm">
+    <input type="hidden" name="page" value="commandes">
+    
+    <select name="status" class="filter-select" onchange="this.form.submit()">
+        <option value="">Toutes</option>
+        <option value="en_attente" {% if statut_filtre == 'en_attente' %}selected{% endif %}>En attente</option>
+        <option value="en_preparation" {% if statut_filtre == 'en_preparation' %}selected{% endif %}>En préparation</option>
+        <option value="livree" {% if statut_filtre == 'livree' %}selected{% endif %}>Livrée</option>
+        <option value="annulee" {% if statut_filtre == 'annulee' %}selected{% endif %}>Annulée</option>
+    </select>
+</form>
+                <input type="text" class="search-in" placeholder="🔍 Rechercher..." onkeyup="filterTbl('tbl-cmd', this.value)">
+            </div>
+        </div>
+
+        <div class="tbl-card">
+            <table class="m-table" id="tbl-cmd">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Client</th>
+                        <th>Total</th>
+                        <th>Statut</th>
+                        <th>Date</th>
+                        <th>Détails</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cmd in commandes_list %}
+                    <tr onclick="toggleInline('cmd-detail-{{ cmd.id }}')" style="cursor:pointer;">
+                        <td style="color:#fff; font-weight:500;">#{{ cmd.id }}</td>
+                        <td>{{ cmd.user.username|default:"—" }}</td>
+                        <td style="color:#4ade80; font-weight:500;">{{ cmd.total }} DH</td>
+                        <td><span class="badge-s bs-{{ cmd.statut }}">{{ cmd.get_statut_display }}</span></td>
+                        <td style="color:#555; font-size:12px;">{{ cmd.created_at|date:"d/m/Y H:i" }}</td>
+                        <td style="color:#333; font-size:11px;">▼ voir</td>
+                    </tr>
+                    <!-- détails inline -->
+                    <tr id="cmd-detail-{{ cmd.id }}" style="display:none;">
+                        <td colspan="6" style="padding:0;">
+                            <div class="detail-row">
+                                <div style="display:flex; gap:30px; flex-wrap:wrap;">
+                                    <div>
+                                        <div style="color:#444; font-size:10px; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px;">Adresse</div>
+                                        <div style="color:#888; font-size:12px;">{{ cmd.adresse_livraison|default:"—" }}</div>
+                                    </div>
+                                    <div>
+                                        <div style="color:#444; font-size:10px; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px;">Commentaire</div>
+                                        <div style="color:#888; font-size:12px;">{{ cmd.commentaire|default:"—" }}</div>
+                                    </div>
+                                </div>
+                                <ul class="detail-items-list">
+                                    {% for item in cmd.order_items.all %}
+                                    <li>
+                                        <span>{{ item.plat.nom }}</span>
+                                        <span style="color:#666;">×{{ item.quantite }} — {{ item.prix }} DH</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="empty-td">Aucune commande</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div><!-- /commandes -->
+
+
+    <!-- ══════════════════
+         PAGE : EMPLOYÉS
+    ══════════════════ -->
+    <div class="page" id="page-employes">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="page-title mb-0">👥 Employés</h2>
+            <input type="text" class="search-in" placeholder="🔍 Rechercher..." onkeyup="filterTbl('tbl-emp', this.value)">
+        </div>
+
+        <!-- FORMULAIRE AJOUT -->
+        <div class="add-card">
+            <div class="add-card-title">➕ Ajouter un employé</div>
+            <form method="POST" action="{% url 'employe_add' %}">
+                {% csrf_token %}
+                <div class="row g-2">
+                    <div class="col-md-2">
+                        <label class="f-label">Nom</label>
+                        <input name="nom" class="f-input" placeholder="Nom" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="f-label">Prénom</label>
+                        <input name="prenom" class="f-input" placeholder="Prénom" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="f-label">Username</label>
+                        <input name="username" class="f-input" placeholder="login" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="f-label">Mot de passe</label>
+                        <input name="password" type="password" class="f-input" placeholder="••••••" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="f-label">Téléphone</label>
+                        <input name="telephone" class="f-input" placeholder="06xxxxxxxx">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="f-label">Poste</label>
+                        <select name="poste" class="f-input">
+                            <option value="cuisinier">Cuisinier</option>
+                            <option value="serveur">Serveur</option>
+                            <option value="manager">Manager</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn-submit-m w-100">Ajouter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- TABLE -->
+        <div class="tbl-card">
+            <table class="m-table" id="tbl-emp">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Poste</th>
+                        <th>Téléphone</th>
+                        <th>Embauche</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in employes %}
+                    <tr>
+                        <td style="color:#fff; font-weight:500;">{{ e.nom }}</td>
+                        <td>{{ e.prenom }}</td>
+                        <td><span class="badge-s bp-{{ e.poste }}">{{ e.get_poste_display }}</span></td>
+                        <td>{{ e.telephone }}</td>
+                        <td style="color:#555; font-size:12px;">{{ e.date_embauche|date:"d/m/Y" }}</td>
+                        <td>
+                            <button class="btn-edit-m" onclick="toggleInline('emp-edit-{{ e.id }}')">✏️ Modifier</button>
+                            <a href="{% url 'employe_delete' e.id %}" class="btn-delete-m"
+                               onclick="return confirm('Supprimer {{ e.prenom }} {{ e.nom }} ?')">Supprimer</a>
+                        </td>
+                    </tr>
+                    <!-- EDIT INLINE -->
+                    <tr id="emp-edit-{{ e.id }}" style="display:none;">
+                        <td colspan="6" style="padding:0;">
+                            <div class="detail-row">
+                                <form method="POST" action="{% url 'employe_update_role' e.id %}">
+                                    {% csrf_token %}
+                                    <div class="row g-2 align-items-end">
+                                        <div class="col-md-3">
+                                            <label class="f-label">Changer le poste</label>
+                                            <select name="poste" class="f-input">
+                                                <option value="cuisinier" {% if e.poste == 'cuisinier' %}selected{% endif %}>Cuisinier</option>
+                                                <option value="serveur"   {% if e.poste == 'serveur'   %}selected{% endif %}>Serveur</option>
+                                                <option value="manager"   {% if e.poste == 'manager'   %}selected{% endif %}>Manager</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="f-label">Téléphone</label>
+                                            <input name="telephone" class="f-input" value="{{ e.telephone }}">
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="submit" class="btn-submit-m">✔ Enregistrer</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="empty-td">Aucun employé</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div><!-- /employes -->
+
+
+    <!-- ══════════════════
+         PAGE : PLATS
+    ══════════════════ -->
+    <div class="page" id="page-plats">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="page-title mb-0">🍽 Plats</h2>
+            <input type="text" class="search-in" placeholder="🔍 Rechercher..." onkeyup="filterTbl('tbl-plats', this.value)">
+        </div>
+
+        <!-- ADD FORM -->
+        <div class="add-card">
+            <div class="add-card-title">➕ Ajouter un plat</div>
+            <form method="POST" enctype="multipart/form-data" action="{% url 'plat_add' %}">
+                {% csrf_token %}
+                <div class="row g-2">
+                    <div class="col-md-2">
+                        <label class="f-label">Nom</label>
+                        <input name="nom" class="f-input" placeholder="Nom du plat" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="f-label">Prix (DH)</label>
+                        <input name="prix" type="number" step="0.01" class="f-input" placeholder="0.00" required>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="f-label">Stock</label>
+                        <input name="stock" type="number" class="f-input" placeholder="0" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="f-label">Catégorie</label>
+                        <select name="categorie" class="f-input">
+                            {% for c in categories %}
+                            <option value="{{ c.id }}">{{ c.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="f-label">Description</label>
+                        <input name="description" class="f-input" placeholder="Courte description">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="f-label">Image</label>
+                        <input name="image" type="file" class="f-input" style="padding:4px;">
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn-submit-m w-100">Ajouter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- TABLE -->
+        <div class="tbl-card">
+            <table class="m-table" id="tbl-plats">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Catégorie</th>
+                        <th>Prix</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in plats %}
+                    <tr>
+                        <td>
+                            {% if p.image %}
+                            <img src="{{ p.image.url }}" class="plat-img">
+                            {% else %}
+                            <div class="plat-no-img">🍽</div>
+                            {% endif %}
+                        </td>
+                        <td style="color:#fff; font-weight:500;">{{ p.nom }}</td>
+                        <td>{{ p.categorie.nom|default:"—" }}</td>
+                        <td style="color:#4ade80; font-weight:500;">{{ p.prix }} DH</td>
+                        <td style="color:{% if p.stock < 5 %}#f87171{% else %}#bbb{% endif %};">{{ p.stock }}</td>
+                        <td>
+                            <button class="btn-edit-m" onclick="toggleInline('plat-edit-{{ p.id }}')">✏️ Modifier</button>
+                            <a href="{% url 'plat_delete' p.id %}" class="btn-delete-m"
+                               onclick="return confirm('Supprimer {{ p.nom }} ?')">Supprimer</a>
+                        </td>
+                    </tr>
+                    <!-- EDIT INLINE -->
+                    <tr id="plat-edit-{{ p.id }}" style="display:none;">
+                        <td colspan="6" style="padding:0;">
+                            <div class="detail-row">
+                                <form method="POST" enctype="multipart/form-data" action="{% url 'plat_update' p.id %}">
+                                    {% csrf_token %}
+                                    <div class="row g-2 align-items-end">
+                                        <div class="col-md-2">
+                                            <label class="f-label">Nom</label>
+                                            <input name="nom" class="f-input" value="{{ p.nom }}">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="f-label">Prix</label>
+                                            <input name="prix" type="number" step="0.01" class="f-input" value="{{ p.prix }}">
+                                        </div>
+                                        <div class="col-md-1">
+                                            <label class="f-label">Stock</label>
+                                            <input name="stock" type="number" class="f-input" value="{{ p.stock }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="f-label">Description</label>
+                                            <input name="description" class="f-input" value="{{ p.description }}">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="f-label">Catégorie</label>
+                                            <select name="categorie" class="f-input">
+                                                {% for c in categories %}
+                                                <option value="{{ c.id }}" {% if p.categorie.id == c.id %}selected{% endif %}>{{ c.nom }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <label class="f-label">Image</label>
+                                            <input name="image" type="file" class="f-input" style="padding:4px;">
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="submit" class="btn-submit-m">✔ Enregistrer</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="empty-td">Aucun plat</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div><!-- /plats -->
+
+
+    <!-- ══════════════════
+         PAGE : CATÉGORIES
+    ══════════════════ -->
+    <div class="page" id="page-categories">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="page-title mb-0">🏷️ Catégories</h2>
+        </div>
+
+        <!-- ADD FORM -->
+        <div class="add-card">
+            <div class="add-card-title">➕ Ajouter une catégorie</div>
+            <form method="POST" action="{% url 'categorie_add' %}">
+                {% csrf_token %}
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label class="f-label">Nom</label>
+                        <input name="nom" id="cat-nom" class="f-input" placeholder="Ex: Tajines" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="f-label">Slug</label>
+                        <input name="slug" id="cat-slug" class="f-input" placeholder="ex: tajines" required>
+                        <small style="color:#333; font-size:10px;">Généré auto, modifiable</small>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn-submit-m">Ajouter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- TABLE -->
+        <div class="tbl-card">
+            <table class="m-table" id="tbl-cats">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Slug</th>
+                        <th>Nb plats</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in categories %}
+                    <tr>
+                        <td style="color:#fff; font-weight:500;">{{ c.nom }}</td>
+                        <td style="color:#444; font-family:monospace; font-size:12px;">{{ c.slug }}</td>
+                        <td>{{ c.plats.count }}</td>
+                        <td>
+                            <button class="btn-edit-m" onclick="toggleInline('cat-edit-{{ c.id }}')">✏️ Modifier</button>
+                            <a href="{% url 'categorie_delete' c.id %}" class="btn-delete-m"
+                               onclick="return confirm('Supprimer {{ c.nom }} ?')">Supprimer</a>
+                        </td>
+                    </tr>
+                    <!-- EDIT INLINE -->
+                    <tr id="cat-edit-{{ c.id }}" style="display:none;">
+                        <td colspan="4" style="padding:0;">
+                            <div class="detail-row">
+                                <form method="POST" action="{% url 'categorie_update' c.id %}">
+                                    {% csrf_token %}
+                                    <div class="row g-2 align-items-end">
+                                        <div class="col-md-4">
+                                            <label class="f-label">Nom</label>
+                                            <input name="nom" class="f-input" value="{{ c.nom }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="f-label">Slug</label>
+                                            <input name="slug" class="f-input" value="{{ c.slug }}">
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="submit" class="btn-submit-m">✔ Enregistrer</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="empty-td">Aucune catégorie</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div><!-- /categories -->
+
+
+    <!-- ══════════════════
+         PAGE : RAPPORTS
+    ══════════════════ -->
+    <div class="page" id="page-rapports">
+        <h2 class="page-title">📁 Exports CSV</h2>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="stat-card" style="text-align:center; padding:28px;">
+                    <div style="font-size:30px; margin-bottom:10px;">📊</div>
+                    <div style="color:#fff; font-size:13px; font-weight:500; margin-bottom:5px;">Commandes</div>
+                    <div style="color:#444; font-size:12px; margin-bottom:14px;">Toutes les commandes</div>
+                    <a href="{% url 'manager_export_commandes' %}" class="btn-primary-m" style="width:100%; text-align:center;">Télécharger</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card" style="text-align:center; padding:28px;">
+                    <div style="font-size:30px; margin-bottom:10px;">👥</div>
+                    <div style="color:#fff; font-size:13px; font-weight:500; margin-bottom:5px;">Employés</div>
+                    <div style="color:#444; font-size:12px; margin-bottom:14px;">Liste du personnel</div>
+                    <a href="{% url 'manager_export_employes' %}" class="btn-primary-m" style="width:100%; text-align:center;">Télécharger</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card" style="text-align:center; padding:28px;">
+                    <div style="font-size:30px; margin-bottom:10px;">🍽</div>
+                    <div style="color:#fff; font-size:13px; font-weight:500; margin-bottom:5px;">Menu complet</div>
+                    <div style="color:#444; font-size:12px; margin-bottom:14px;">Tous les plats</div>
+                    <a href="{% url 'manager_export_plats' %}" class="btn-primary-m" style="width:100%; text-align:center;">Télécharger</a>
+                </div>
+            </div>
+        </div>
+    </div><!-- /rapports -->
+
+</div><!-- /main -->
+
+
+<!-- ══════════════════════════════════════
+     CHARTS JS
+══════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    window.addEventListener('load', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page');
+
+    if (page) {
+        goTo(page);
+    }
+    });
+    /* ══ NAVIGATION ══ */
+    const pageTitles = {
+        stats:      '📊 Statistiques',
+        commandes:  '📋 Commandes',
+        employes:   '👥 Employés',
+        plats:      '🍽 Plats',
+        categories: '🏷️ Catégories',
+        rapports:   '📁 Rapports',
+    };
+
+    function goTo(name, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('page-' + name).classList.add('active');
+        document.getElementById('topTitle').textContent = pageTitles[name];
+        if (el) el.classList.add('active');
+    }
+
+    /* ══ INLINE TOGGLE ══ */
+    function toggleInline(id) {
+        const el = document.getElementById(id);
+        el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
+    }
+
+    /* ══ TABLE FILTER ══ */
+    function filterTbl(id, q) {
+        q = q.toLowerCase();
+        document.querySelectorAll('#' + id + ' tbody tr').forEach(tr => {
+            if (!tr.id) tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    }
+
+    /* ══ AUTO SLUG ══ */
+    const catNom = document.getElementById('cat-nom');
+    const catSlug = document.getElementById('cat-slug');
+    if (catNom && catSlug) {
+        catNom.addEventListener('input', () => {
+            catSlug.value = catNom.value.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        });
+    }
+
+    /* ══ CHARTS ══ */
+    const gridColor = '#1e1e1e';
+    const tickColor = '#444';
+    const baseOpts = {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } },
+            y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } }, beginAtZero: true }
+        }
+    };
+
+    // Ventes ligne
+    new Chart(document.getElementById('chartVentes'), {
+        type: 'line',
+        data: {
+            labels: {{ labels|safe }},
+            datasets: [{
+                data: {{ data|safe }},
+                borderColor: '#C8102E',
+                backgroundColor: 'rgba(200,16,46,0.08)',
+                tension: 0.4, fill: true,
+                pointRadius: 4, pointBackgroundColor: '#C8102E',
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            ...baseOpts,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' DH' } }
+            }
+        }
+    });
+
+    // Plats bar
+    new Chart(document.getElementById('chartPlats'), {
+        type: 'bar',
+        data: {
+            labels: {{ plats_labels|safe }},
+            datasets: [{
+                data: {{ plats_data|safe }},
+                backgroundColor: 'rgba(200,16,46,0.7)',
+                borderColor: '#C8102E', borderWidth: 1, borderRadius: 5,
+            }]
+        },
+        options: baseOpts
+    });
+
+    // Statuts donut
+    new Chart(document.getElementById('chartStatuts'), {
+        type: 'doughnut',
+        data: {
+            labels: ['En attente','En préparation','Sérvie','Annulée'],
+            datasets: [{
+                data: {{ statut_data|safe }},
+                backgroundColor: ['#f59e0b','#3b82f6','#22c55e','#ef4444'],
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true, cutout: '65%',
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#555', font: { size: 10 }, padding: 8 } }
+            }
+        }
+    });
+</script>
+</body>
+</html>
