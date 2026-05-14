@@ -163,7 +163,7 @@
         .bs-en_attente     { background:#2d2200; color:#f59e0b; }
         .bs-en_cours       { background:#001833; color:#60a5fa; }
         .bs-en_preparation { background:#001833; color:#60a5fa; }
-        .bs-livree         { background:#1e1b4b; color:#a5b4fc; }
+        .bs-Servie         { background:#1e1b4b; color:#a5b4fc; }
         .bs-annulee        { background:#220000; color:#f87171; }
         .bs-prete          { background:#002208; color:#4ade80; }
         .bp-cuisinier      { background:#2d1000; color:#fb923c; }
@@ -440,7 +440,7 @@
         <option value="">Toutes</option>
         <option value="en_attente" {% if statut_filtre == 'en_attente' %}selected{% endif %}>En attente</option>
         <option value="en_preparation" {% if statut_filtre == 'en_preparation' %}selected{% endif %}>En préparation</option>
-        <option value="livree" {% if statut_filtre == 'livree' %}selected{% endif %}>Livrée</option>
+        <option value="Servie" {% if statut_filtre == 'Servie' %}selected{% endif %}>Servie</option>
         <option value="annulee" {% if statut_filtre == 'annulee' %}selected{% endif %}>Annulée</option>
     </select>
 </form>
@@ -695,7 +695,7 @@
                         <td style="color:#4ade80; font-weight:500;">{{ p.prix }} DH</td>
                         <td style="color:{% if p.stock < 5 %}#f87171{% else %}#bbb{% endif %};">{{ p.stock }}</td>
                         <td>
-                            <button class="btn-edit-m" onclick="toggleInline('plat-edit-{{ p.id }}')">✏️ Modifier</button>
+                            <button class="btn-edit-m" onclick="toggleInline('plat-edit-{{ p.id }}')"> Modifier</button>
                             <a href="{% url 'plat_delete' p.id %}" class="btn-delete-m"
                                onclick="return confirm('Supprimer {{ p.nom }} ?')">Supprimer</a>
                         </td>
@@ -757,12 +757,12 @@
     ══════════════════ -->
     <div class="page" id="page-categories">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="page-title mb-0">🏷️ Catégories</h2>
+            <h2 class="page-title mb-0"> Catégories</h2>
         </div>
 
         <!-- ADD FORM -->
         <div class="add-card">
-            <div class="add-card-title">➕ Ajouter une catégorie</div>
+            <div class="add-card-title"> Ajouter une catégorie</div>
             <form method="POST" action="{% url 'categorie_add' %}">
                 {% csrf_token %}
                 <div class="row g-2 align-items-end">
@@ -800,7 +800,7 @@
                         <td style="color:#444; font-family:monospace; font-size:12px;">{{ c.slug }}</td>
                         <td>{{ c.plats.count }}</td>
                         <td>
-                            <button class="btn-edit-m" onclick="toggleInline('cat-edit-{{ c.id }}')">✏️ Modifier</button>
+                            <button class="btn-edit-m" onclick="toggleInline('cat-edit-{{ c.id }}')"> Modifier</button>
                             <a href="{% url 'categorie_delete' c.id %}" class="btn-delete-m"
                                onclick="return confirm('Supprimer {{ c.nom }} ?')">Supprimer</a>
                         </td>
@@ -841,7 +841,7 @@
          PAGE : RAPPORTS
     ══════════════════ -->
     <div class="page" id="page-rapports">
-        <h2 class="page-title">📁 Exports CSV</h2>
+        <h2 class="page-title"> Exports CSV</h2>
         <div class="row g-3">
             <div class="col-md-4">
                 <div class="stat-card" style="text-align:center; padding:28px;">
@@ -888,12 +888,12 @@
     });
     /* ══ NAVIGATION ══ */
     const pageTitles = {
-        stats:      '📊 Statistiques',
-        commandes:  '📋 Commandes',
-        employes:   '👥 Employés',
-        plats:      '🍽 Plats',
-        categories: '🏷️ Catégories',
-        rapports:   '📁 Rapports',
+        stats:      ' Statistiques',
+        commandes:  ' Commandes',
+        employes:   ' Employés',
+        plats:      ' Plats',
+        categories: ' Catégories',
+        rapports:   ' Rapports',
     };
 
     function goTo(name, el) {
